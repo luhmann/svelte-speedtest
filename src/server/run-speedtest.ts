@@ -77,11 +77,12 @@ export const mapSpeedtestResult = (test: SpeedtestResult): Omit<Test, 'id'> => (
 
 // ? account for different network-card-names for dev and prod-env
 const networkInterface = process.env.NETWORK_INTERFACE ?? 'eth0';
+const speedtestBin = process.env.SPEEDTEST_BINARY ?? '/usr/local/bin/speedtest';
 
 export async function run(): Promise<void> {
   try {
     const { stdout, stderr } = (await exec(
-      `/usr/local/bin/speedtest --interface=${networkInterface} --progress=no --format=json-pretty --server-id=28622`,
+      `${speedtestBin} --interface=${networkInterface} --progress=no --format=json-pretty --server-id=28622`,
       {
         cwd: __dirname,
         shell: '/bin/bash',
