@@ -117,3 +117,9 @@ dist
 
 # speedtest src
 speedtests
+
+# snowpack dependencies
+.build
+build
+web_modules
+node_modules
