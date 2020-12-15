@@ -1,0 +1,33 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Test {
+  id                Int      @id @default(autoincrement())
+  timestamp         DateTime
+  jitter            Float
+  latency           Float
+  downloadBandwidth Int
+  downloadBytes     Int
+  downloadElapsed   Int
+  uploadBandwidth   Int
+  uploadBytes       Int
+  uploadElapsed     Int
+  packetLoss        Float
+  isp               String
+  interfaceName     String
+  externalIp        String
+  serverName        String
+  serverId          Int
+  serverIp          String
+  resultId          String
+  resultUrl         String
+}
