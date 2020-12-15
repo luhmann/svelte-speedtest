@@ -1,0 +1,36 @@
+{
+  "name": "speedtest",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev:reset-db": "prisma migrate reset --preview-feature --schema='./src/server/prisma/schema.prisma'",
+    "dev:import-data": "ts-node ./src/server/import-data.ts",
+    "lint": "eslint . --ext .ts --fix",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Jan Florian Dietrich <jfd@daenen4.de> (http://www.daenen4.de/)",
+  "license": "ISC",
+  "devDependencies": {
+    "@prisma/cli": "^2.13.0",
+    "@types/glob": "^7.1.3",
+    "@types/node": "^14.14.13",
+    "@typescript-eslint/eslint-plugin": "^4.10.0",
+    "@typescript-eslint/parser": "^4.10.0",
+    "eslint": "^7.15.0",
+    "eslint-config-prettier": "^7.0.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-prettier": "^3.3.0",
+    "eslint-plugin-unicorn": "^23.0.0",
+    "prettier": "^2.2.1",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.1.3"
+  },
+  "dependencies": {
+    "@prisma/client": "^2.13.0",
+    "dotenv": "^8.2.0",
+    "glob": "^7.1.6",
+    "loglevel": "^1.7.1"
+  }
+}
