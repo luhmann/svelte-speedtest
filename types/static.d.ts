@@ -57,3 +57,5 @@ declare module '*.png' {
 }
 
 /* CUSTOM: ADD YOUR OWN HERE */
+// TODO: check types more extensively
+declare module 'svelte-frappe-charts';
