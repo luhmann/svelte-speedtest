@@ -4,6 +4,7 @@
   import { map } from 'rxjs/operators';
   import type { Test } from '../../server/utils/database-client';
   import { formatDate } from '../utils/date-format';
+  import Spinner from '../spinner/spinner.svelte';
 
   const BYTE_MBIT_FACTOR = 125_000;
   const GRAPH_BASE_CONFIG = {
@@ -20,6 +21,7 @@
     tooltipOptions: {
       formatTooltipY: (data: string) => `${data} Mbps/s`,
     },
+    truncateLegends: true,
   };
   const GRAPH_DOWNLOAD_REGIONS = {
     yMarkers: [
@@ -28,7 +30,7 @@
         value: 600,
       },
       {
-        label: 'Normal',
+        label: 'Regular',
         value: 800,
       },
       {
@@ -45,7 +47,7 @@
         value: 30,
       },
       {
-        label: 'Normal',
+        label: 'Regular',
         value: 40,
       },
       {
@@ -99,13 +101,20 @@
     .toPromise();
 </script>
 
-<div id="chart-container">
+<section class="p-1">
   {#await promise}
-    <p>Fetching data ...</p>
+    <div class="w-full h-full flex flex-col justify-center items-center">
+      <Spinner />
+      <div class="pt-3">Fetching Data</div>
+    </div>
   {:then config}
-    <Chart {...config.download} />
+    <div class="pb-3">
+      <h2 class="text-gray-800">Downstream</h2>
+      <Chart {...config.download} />
+    </div>
+    <h2 class="text-gray-800">Upstream</h2>
     <Chart {...config.upload} />
   {:catch error}
     <p>Something went wrong: {error.message}</p>
   {/await}
-</div>
+</section>

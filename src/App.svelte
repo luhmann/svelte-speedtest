@@ -1,13 +1,14 @@
 <script lang="typescript">
   import './main.css';
-  import { interval } from 'rxjs';
-  import { startWith } from 'rxjs/operators';
-  import Graph from './graph/graph.svelte';
-
-  const rxTimer = interval(1000).pipe(startWith(0));
+  import Graphs from './graphs/graphs.svelte';
 </script>
 
-<div>
-  <header class="px-5 bg-green-300 box">How slow?</header>
-  <Graph />
+<div class="container mx-auto px-4">
+  <header class="pt-5 pb-8">
+    <h1 class="text-4xl pb-2 box text-gray-700 font-mono font-bold tracking-wider">How slow?</h1>
+    <div class="text-l text-gray-500 font-mono">How little bandwidth is my cable-provider giving me today?</div>
+  </header>
+  <Graphs />
+
+  <!-- TODO: display how often the minimum was not reached below charts-->
 </div>
