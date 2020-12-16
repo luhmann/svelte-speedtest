@@ -1,15 +1,13 @@
-export const timestampSchema = {
-  type: 'string',
-  format: 'date-time',
-};
-
 export const measurementSchema = {
   type: 'object',
   properties: {
     id: {
       type: 'number',
     },
-    timestamp: timestampSchema,
+    timestamp: {
+      type: 'string',
+      format: 'date-time',
+    },
     jitter: {
       type: 'number',
     },

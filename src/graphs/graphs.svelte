@@ -1,10 +1,8 @@
 <script lang="typescript">
-  import { ajax } from 'rxjs/ajax';
+  import { map, tap } from 'rxjs/operators';
   import Chart from 'svelte-frappe-charts';
-  import { map } from 'rxjs/operators';
-  import type { Test } from '../../server/utils/database-client';
+  import { speedtestData$ } from '../stores/timeframe';
   import { formatDate } from '../utils/date-format';
-  import Spinner from '../spinner/spinner.svelte';
 
   const BYTE_MBIT_FACTOR = 125_000;
   const GRAPH_BASE_CONFIG = {
@@ -57,64 +55,55 @@
     ],
   };
 
-  const promise = ajax
-    .getJSON<Test[]>('http://local.test:3000/v1/measurements?since=2020-12-10T00:00:00Z')
-    .pipe(
-      map((measurements) =>
-        measurements.map((measurement) => [
-          formatDate(measurement.timestamp),
-          (measurement.downloadBandwidth / BYTE_MBIT_FACTOR).toFixed(2),
-          (measurement.uploadBandwidth / BYTE_MBIT_FACTOR).toFixed(2),
-        ]),
+  const promise$ = speedtestData$.pipe(
+    map((measurements) =>
+      measurements.map((measurement) => [
+        formatDate(measurement.timestamp),
+        (measurement.downloadBandwidth / BYTE_MBIT_FACTOR).toFixed(2),
+        (measurement.uploadBandwidth / BYTE_MBIT_FACTOR).toFixed(2),
+      ]),
+    ),
+    map((measurements) =>
+      measurements.reduce(
+        (acc, [label, download, upload]) => ({
+          labels: [...(acc.labels ?? []), label],
+          download: [...(acc.download ?? []), download],
+          upload: [...(acc.upload ?? []), upload],
+        }),
+        {} as any,
       ),
-      map((measurements) =>
-        measurements.reduce(
-          (acc, [label, download, upload]) => ({
-            labels: [...(acc.labels ?? []), label],
-            download: [...(acc.download ?? []), download],
-            upload: [...(acc.upload ?? []), upload],
-          }),
-          {} as any,
-        ),
-      ),
-      map(({ labels, upload, download }) => ({
-        download: {
-          data: {
-            labels,
-            datasets: [{ name: 'Download Bandwidth', values: download }],
-            ...GRAPH_DOWNLOAD_REGIONS,
-          },
-          ...GRAPH_BASE_CONFIG,
-          colors: ['#60A5FA'],
+    ),
+    map(({ labels, upload, download }) => ({
+      download: {
+        data: {
+          labels,
+          datasets: [{ name: 'Download Bandwidth', values: download }],
+          ...GRAPH_DOWNLOAD_REGIONS,
         },
-        upload: {
-          data: {
-            labels,
-            datasets: [{ name: 'Upload Bandwidth', values: upload }],
-            ...GRAPH_UPLOAD_REGIONS,
-          },
-          ...GRAPH_BASE_CONFIG,
-          colors: ['#F472B6'],
+        ...GRAPH_BASE_CONFIG,
+        colors: ['#60A5FA'],
+      },
+      upload: {
+        data: {
+          labels,
+          datasets: [{ name: 'Upload Bandwidth', values: upload }],
+          ...GRAPH_UPLOAD_REGIONS,
         },
-      })),
-    )
-    .toPromise();
+        ...GRAPH_BASE_CONFIG,
+        colors: ['#F472B6'],
+      },
+    })),
+    tap((data) => console.log(data)),
+  );
 </script>
 
 <section class="p-1">
-  {#await promise}
-    <div class="w-full h-full flex flex-col justify-center items-center">
-      <Spinner />
-      <div class="pt-3">Fetching Data</div>
-    </div>
-  {:then config}
+  {#if $promise$}
     <div class="pb-3">
       <h2 class="text-gray-800">Downstream</h2>
-      <Chart {...config.download} />
+      <Chart {...$promise$.download} />
     </div>
     <h2 class="text-gray-800">Upstream</h2>
-    <Chart {...config.upload} />
-  {:catch error}
-    <p>Something went wrong: {error.message}</p>
-  {/await}
+    <Chart {...$promise$.upload} />
+  {/if}
 </section>

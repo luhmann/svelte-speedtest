@@ -1,17 +1,18 @@
 import { FastifyError, FastifyInstance, FastifyServerOptions } from 'fastify';
-import { measurementSchema, timestampSchema } from '../schema/test';
+import { Type, Static } from '@sinclair/typebox';
+import { measurementSchema } from '../schema/test';
 import { database } from '../utils/database-client';
 
-interface MeasurementQuery {
-  since: string;
-}
+const QuerySchema = Type.Object({
+  since: Type.String({ format: 'date-time' }),
+});
+
+type QuerySchema = Static<typeof QuerySchema>;
 
 export default (app: FastifyInstance, options: FastifyServerOptions, done: (error?: FastifyError) => void): void => {
   const measurementOptions = {
     schema: {
-      querystring: {
-        since: timestampSchema,
-      },
+      querystring: QuerySchema,
       response: {
         200: {
           type: 'array',
@@ -21,7 +22,8 @@ export default (app: FastifyInstance, options: FastifyServerOptions, done: (erro
       },
     },
   };
-  app.get<{ Querystring: MeasurementQuery }>('/measurements', measurementOptions, async (request) => {
+  app.get<{ Querystring: QuerySchema }>('/measurements', measurementOptions, async (request) => {
+    console.log(request.query.since);
     const sinceParameter = new Date(request.query.since);
     const result = await database.test.findMany({ where: { timestamp: { gt: sinceParameter } } });
 
