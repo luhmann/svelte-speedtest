@@ -52,6 +52,7 @@
     "@prisma/client": "^2.13.0",
     "dotenv": "^8.2.0",
     "fastify": "^3.9.1",
+    "fastify-cors": "^5.1.0",
     "glob": "^7.1.6",
     "loglevel": "^1.7.1",
     "rxjs": "^6.6.3",
