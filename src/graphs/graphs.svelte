@@ -23,7 +23,6 @@
     tooltipOptions: {
       formatTooltipY: (data: string) => `${data} Mbps/s`,
     },
-    truncateLegends: true,
   };
   const GRAPH_DOWNLOAD_REGIONS = {
     yMarkers: [
@@ -70,7 +69,6 @@
     axisOptions: AxisOptions;
     lineOptions: LineOptions;
     tooltipOptions: Options;
-    truncateLegends: boolean;
     colors: string[];
   }
 

@@ -4,6 +4,10 @@
   import DurationSelection from './duration-selection/duration-selection.svelte';
 </script>
 
+<svelte:head>
+  <title>How slow?</title>
+</svelte:head>
+
 <div class="container mx-auto px-4">
   <header class="pt-5 pb-8">
     <h1 class="text-4xl pb-2 box text-gray-700 font-mono font-bold tracking-wider">How slow?</h1>
