@@ -1,10 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { formatRFC3339, sub } from 'date-fns';
-import { BehaviorSubject, Subject } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
-import { filter, map, startWith, switchMap, tap } from 'rxjs/operators';
+import { filter, map, switchMap, tap } from 'rxjs/operators';
 import type { Test } from '../../server/utils/database-client';
-import { inputIsNotNullOrUndefined } from '../utils/rxjs';
+import { decorateRequestWithStatus, getSvelteSubject, inputIsNotNullOrUndefined } from '../utils/rxjs';
 
 export const DURATIONS: Duration[] = [
   {
@@ -30,17 +28,18 @@ export interface Duration {
   query: { [key: string]: number };
 }
 
-export const timeframe$ = new BehaviorSubject<Duration['label']>(DURATIONS[1].label);
-// TODO: make this better
-// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-(timeframe$ as any).set = (timeframe$ as any).next;
+export const selectedDuration$ = getSvelteSubject<Duration['label']>(DURATIONS[1].label);
 
-export const speedtestData$ = timeframe$.pipe(
-  tap((item) => console.log(item)),
+const since$ = selectedDuration$.pipe(
   map((label) => DURATIONS.find((item) => item.label === label)),
   filter(inputIsNotNullOrUndefined),
-  // TODO: use fp-version of lib here
+  // TODO: use fp-version of lib
   map((timeframe) => encodeURIComponent(formatRFC3339(sub(Date.now(), timeframe.query)))),
+);
+
+export const speedtestData$ = since$.pipe(
   // TODO: externalize URL-creation make dependent on config
-  switchMap((since) => ajax.getJSON<Test[]>(`http://local.test:3000/v1/measurements?since=${since}`)),
+  switchMap((since) =>
+    decorateRequestWithStatus(ajax.getJSON<Test[]>(`http://local.test:3000/v1/measurements?since=${since}`)),
+  ),
 );
