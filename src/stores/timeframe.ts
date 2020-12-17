@@ -1,6 +1,7 @@
 import { formatRFC3339, sub } from 'date-fns';
+import { pipe } from 'remeda';
 import { ajax } from 'rxjs/ajax';
-import { filter, map, switchMap, tap } from 'rxjs/operators';
+import { filter, map, switchMap } from 'rxjs/operators';
 import type { Test } from '../../server/utils/database-client';
 import { decorateRequestWithStatus, getSvelteSubject, inputIsNotNullOrUndefined } from '../utils/rxjs';
 
@@ -30,11 +31,12 @@ export interface Duration {
 
 export const selectedDuration$ = getSvelteSubject<Duration['label']>(DURATIONS[1].label);
 
+const getSinceTimestamp = (query: Duration['query']) => pipe(sub(Date.now(), query), formatRFC3339, encodeURIComponent);
+
 const since$ = selectedDuration$.pipe(
   map((label) => DURATIONS.find((item) => item.label === label)),
   filter(inputIsNotNullOrUndefined),
-  // TODO: use fp-version of lib
-  map((timeframe) => encodeURIComponent(formatRFC3339(sub(Date.now(), timeframe.query)))),
+  map((period) => getSinceTimestamp(period.query)),
 );
 
 export const speedtestData$ = since$.pipe(
