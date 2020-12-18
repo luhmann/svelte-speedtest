@@ -4,15 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npm run client:dev & npm run server:dev",
+    "build": "npm run client:build && npm run server:build",
     "client:dev": "snowpack dev",
     "client:build": "snowpack build",
     "client:test": "web-test-runner \"src/**/*.test.ts\"",
     "dev:reset-db": "prisma migrate reset --preview-feature",
     "dev:import-data": "ts-node --project ./server/tsconfig.json ./server/import-data.ts",
     "lint": "eslint . --ext .ts --fix",
-    "server": "ts-node --project ./server/tsconfig.json ./server/index.ts",
-    "server:dev": "nodemon --watch \"server/**\" --ext \"ts,json\" --ignore \"server/**/*.spec.ts\" --exec \"npm run server\""
+    "server:build": "tsc --project ./server/tsconfig.json",
+    "server:dev": "nodemon --watch \"server/**\" --ext \"ts,json\" --ignore \"server/**/*.spec.ts\" --exec \"npm run server\"",
+    "start": "npm run client:dev & npm run server:dev"
   },
   "keywords": [],
   "author": "Jan Florian Dietrich <jfd@daenen4.de> (http://www.daenen4.de/)",

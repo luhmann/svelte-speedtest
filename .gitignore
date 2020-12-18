@@ -123,3 +123,6 @@ speedtests
 build
 web_modules
 node_modules
+
+# server build artifacts
+build-server
