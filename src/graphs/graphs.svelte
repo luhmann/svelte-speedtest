@@ -1,12 +1,13 @@
 <script lang="typescript">
   import { pipe } from 'remeda';
-  import { map, tap } from 'rxjs/operators';
+  import { bufferTime, filter, map, tap } from 'rxjs/operators';
   import Chart from 'svelte-frappe-charts';
   import type { Test } from '../../server/utils/database-client';
   import Spinner from '../spinner/spinner.svelte';
   import { speedtestData$ } from '../stores/timeframe';
   import { formatDate } from '../utils/date-format';
   import { mapDataForSuccess, Status } from '../utils/rxjs';
+  import { tag } from 'rxjs-spy/cjs/operators';
 
   const BYTE_MBIT_FACTOR = 125_000;
   const GRAPH_BASE_CONFIG = {
@@ -65,16 +66,6 @@
 
   interface Load {
     data: Data;
-    type: string;
-    axisOptions: AxisOptions;
-    lineOptions: LineOptions;
-    tooltipOptions: Options;
-    colors: string[];
-  }
-
-  interface AxisOptions {
-    xIsSeries: boolean;
-    xAxisMode: string;
   }
 
   interface Data {
@@ -92,14 +83,6 @@
   interface YMarker {
     label: string;
     value: number;
-  }
-
-  interface Options {}
-
-  interface LineOptions {
-    hideDots: number;
-    spline: number;
-    regionFill: number;
   }
 
   const getGraphConfig = (measurements: Test[]): FrappeChartConfig =>
@@ -142,20 +125,31 @@
       }),
     );
 
-  // TODO: implement polling
-  const measurementReq$ = speedtestData$.pipe(map(mapDataForSuccess<any, FrappeChartConfig>(getGraphConfig)));
+  const isLoading$ = speedtestData$.pipe(
+    bufferTime(400),
+    filter((statusStates) => statusStates.length > 0),
+    map((statusStates) => (statusStates.pop()?.status ?? Status.SUCCESS) === Status.LOADING),
+  );
+
+  const measurementReq$ = speedtestData$.pipe(
+    map(mapDataForSuccess<any, FrappeChartConfig>(getGraphConfig)),
+    tag('measurementReq$'),
+  );
 </script>
 
 <section class="p-1">
   {#if $measurementReq$}
-    {#if $measurementReq$.status === Status.LOADING}
-      <div class="w-full h-full flex flex-col justify-center items-center">
+    {#if $isLoading$}
+      <div
+        class="full flex flex-col justify-center items-center absolute top-0 left-0 w-screen h-screen bg-opacity-70 bg-gray-200 z-10">
         <Spinner />
         <div class="pt-3">Fetching Data</div>
       </div>
-    {:else if $measurementReq$.status === Status.ERROR}
+    {/if}
+    {#if $measurementReq$.status === Status.ERROR}
+      <!-- TODO: something cute -->
       <div>A heinous error occured</div>
-    {:else if $measurementReq$.status === Status.SUCCESS}
+    {:else if $measurementReq$.status !== Status.INITIAL && $measurementReq$.data}
       <div class="pb-3">
         <h2 class="text-gray-800">Downstream</h2>
         <Chart {...$measurementReq$.data.download} />

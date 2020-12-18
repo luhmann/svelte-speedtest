@@ -44,6 +44,7 @@
     "nodemon": "^2.0.6",
     "postcss-cli": "^8.3.1",
     "prettier": "^2.2.1",
+    "rxjs-spy": "^7.5.3",
     "snowpack": "^2.18.4",
     "svelte-preprocess": "^4.0.8",
     "tailwindcss": "^2.0.2",

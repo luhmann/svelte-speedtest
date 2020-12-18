@@ -1,6 +1,7 @@
 import { formatRFC3339, sub } from 'date-fns';
 import { pipe } from 'remeda';
-import { combineLatest, interval, timer } from 'rxjs';
+import { combineLatest, timer } from 'rxjs';
+import { tag } from 'rxjs-spy/cjs/operators';
 import { ajax } from 'rxjs/ajax';
 import { filter, map, share, switchMap } from 'rxjs/operators';
 import type { Test } from '../../server/utils/database-client';
@@ -43,6 +44,8 @@ const since$ = selectedDuration$.pipe(
   map((period) => getSinceTimestamp(period.query)),
 );
 
+const measurementsRequest = decorateRequestWithStatus();
+
 export const speedtestData$ = combineLatest([timer(0, POLLING_INTERVAL), since$]).pipe(
   map(([, since]) => since),
   switchMap((since) =>
@@ -50,8 +53,9 @@ export const speedtestData$ = combineLatest([timer(0, POLLING_INTERVAL), since$]
       since,
       (since) => getApiUrl(`/measurements`, { since }),
       (apiUrl: string) => ajax.getJSON<Test[]>(apiUrl),
-      decorateRequestWithStatus,
+      measurementsRequest,
     ),
   ),
+  tag('speedtestData$:end'),
   share(),
 );
