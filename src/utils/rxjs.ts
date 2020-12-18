@@ -1,6 +1,6 @@
 import { BehaviorSubject, combineLatest, Observable, of } from 'rxjs';
 import type { AjaxError } from 'rxjs/ajax';
-import { catchError, map, take, tap } from 'rxjs/operators';
+import { catchError, distinctUntilKeyChanged, map, take, tap } from 'rxjs/operators';
 
 export function inputIsNotNullOrUndefined<T>(input: null | undefined | T): input is T {
   return input !== null && input !== undefined;
@@ -37,18 +37,21 @@ export const decorateRequestWithStatus = <T>(request$: Observable<T>): Observabl
     )
     .subscribe();
 
-  return combineLatest([status$, data$]).pipe(map(([status, data]) => ({ data, status })));
+  return combineLatest([status$, data$]).pipe(
+    map(([status, data]) => ({ data, status })),
+    distinctUntilKeyChanged('status'),
+  );
 };
 
 export const mapDataForSuccess = <T, R>(mapFunction: (data: T) => R) => (
   requestWithStatus: RequestWithStatus<T>,
 ): RequestWithStatus<T | R> => {
   const { status, data } = requestWithStatus;
-  if (status === Status.LOADING || status === Status.ERROR) {
-    return requestWithStatus;
+  if (status === Status.SUCCESS) {
+    return { status, data: mapFunction(data as T) };
   }
 
-  return { status, data: mapFunction(data as T) };
+  return requestWithStatus;
 };
 
 interface SvelteSubject<T> extends BehaviorSubject<T> {

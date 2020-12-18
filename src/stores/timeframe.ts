@@ -2,10 +2,12 @@ import { formatRFC3339, sub } from 'date-fns';
 import { pipe } from 'remeda';
 import { combineLatest, interval, timer } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
-import { filter, map, switchMap } from 'rxjs/operators';
+import { filter, map, share, switchMap } from 'rxjs/operators';
 import type { Test } from '../../server/utils/database-client';
 import { getApiUrl } from '../utils/api-urls';
 import { decorateRequestWithStatus, getSvelteSubject, inputIsNotNullOrUndefined } from '../utils/rxjs';
+
+export const POLLING_INTERVAL = 60_000;
 
 export const DURATIONS: Duration[] = [
   {
@@ -41,7 +43,7 @@ const since$ = selectedDuration$.pipe(
   map((period) => getSinceTimestamp(period.query)),
 );
 
-export const speedtestData$ = combineLatest([timer(0, 30_000), since$]).pipe(
+export const speedtestData$ = combineLatest([timer(0, POLLING_INTERVAL), since$]).pipe(
   map(([, since]) => since),
   switchMap((since) =>
     pipe(
@@ -51,4 +53,5 @@ export const speedtestData$ = combineLatest([timer(0, 30_000), since$]).pipe(
       decorateRequestWithStatus,
     ),
   ),
+  share(),
 );
