@@ -128,7 +128,7 @@
             ...GRAPH_DOWNLOAD_REGIONS,
           },
           ...GRAPH_BASE_CONFIG,
-          colors: ['#60A5FA'],
+          colors: ['#88e1f2'],
         },
         upload: {
           data: {
@@ -137,7 +137,7 @@
             ...GRAPH_UPLOAD_REGIONS,
           },
           ...GRAPH_BASE_CONFIG,
-          colors: ['#F472B6'],
+          colors: ['#ff7c7c'],
         },
       }),
     );
