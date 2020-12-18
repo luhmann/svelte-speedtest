@@ -3,6 +3,7 @@ import { pipe } from 'remeda';
 import { ajax } from 'rxjs/ajax';
 import { filter, map, switchMap } from 'rxjs/operators';
 import type { Test } from '../../server/utils/database-client';
+import { getApiUrl } from '../utils/api-urls';
 import { decorateRequestWithStatus, getSvelteSubject, inputIsNotNullOrUndefined } from '../utils/rxjs';
 
 export const DURATIONS: Duration[] = [
@@ -40,8 +41,12 @@ const since$ = selectedDuration$.pipe(
 );
 
 export const speedtestData$ = since$.pipe(
-  // TODO: externalize URL-creation make dependent on config
   switchMap((since) =>
-    decorateRequestWithStatus(ajax.getJSON<Test[]>(`http://local.test:3000/v1/measurements?since=${since}`)),
+    pipe(
+      since,
+      (since) => getApiUrl(`/measurements`, { since }),
+      (apiUrl: string) => ajax.getJSON<Test[]>(apiUrl),
+      decorateRequestWithStatus,
+    ),
   ),
 );
