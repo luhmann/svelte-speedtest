@@ -1,5 +1,6 @@
 import { formatRFC3339, sub } from 'date-fns';
 import { pipe } from 'remeda';
+import { combineLatest, interval, timer } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
 import { filter, map, switchMap } from 'rxjs/operators';
 import type { Test } from '../../server/utils/database-client';
@@ -40,7 +41,8 @@ const since$ = selectedDuration$.pipe(
   map((period) => getSinceTimestamp(period.query)),
 );
 
-export const speedtestData$ = since$.pipe(
+export const speedtestData$ = combineLatest([timer(0, 30_000), since$]).pipe(
+  map(([, since]) => since),
   switchMap((since) =>
     pipe(
       since,

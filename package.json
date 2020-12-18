@@ -11,6 +11,7 @@
     "dev:reset-db": "prisma migrate reset --preview-feature",
     "dev:import-data": "ts-node --project ./server/tsconfig.json ./server/import-data.ts",
     "lint": "eslint . --ext .ts --fix",
+    "postinstall": "prisma generate",
     "server:build": "tsc --project ./server/tsconfig.json",
     "server:dev": "nodemon --watch \"server/**\" --ext \"ts,json\" --ignore \"server/**/*.spec.ts\" --exec \"ts-node --project ./server/tsconfig.json ./server/index.ts\"",
     "start": "npm run client:dev & npm run server:dev"

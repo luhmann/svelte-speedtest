@@ -142,6 +142,7 @@
       }),
     );
 
+  // TODO: implement polling
   const measurementReq$ = speedtestData$.pipe(map(mapDataForSuccess<any, FrappeChartConfig>(getGraphConfig)));
 </script>
 
