@@ -38,7 +38,7 @@ export const decorateRequestWithStatus = <T>() => {
       .pipe(
         tag('measurementsRequest'),
         tap((data) => {
-          data$.next(data);
+          data$.next(data as any);
           status$.next(Status.SUCCESS);
         }),
         catchError((error: AjaxError) => {
