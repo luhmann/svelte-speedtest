@@ -58,7 +58,7 @@
     "dotenv": "^8.2.0",
     "fastify": "^3.9.1",
     "fastify-cors": "^5.1.0",
-    "fastify-static": "^3.3.0",
+    "fastify-static": "^4.2.4",
     "glob": "^7.1.6",
     "loglevel": "^1.7.1",
     "remeda": "0.0.27",
