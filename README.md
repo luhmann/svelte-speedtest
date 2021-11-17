@@ -6,7 +6,7 @@ Measures and visualizes my actual internet speed.
 
 ## How does it work
 
-- Speeds are measured using [speedtest.net](https://www.speedtest.net/de) with the identical upstream server every ten minutes by a RaspberryPi4 that is connected via Gigabit-LAN with a cronjob `server/run-speedtest-cron.ts`.
+- Speeds are measured using [speedtest.net](https://www.speedtest.net/de) with the identical upstream server every ten minutes by a RaspberryPi4 that is connected to supposed Gigabit-LAN with a cronjob `server/run-speedtest-cron.ts`.
 - The Pi is the only device on the whole network in order to not distort the results.
 - The results are saved in a sqlite-database that is connected via [Prisma](https://www.prisma.io/)
 - A [Fastify](https://www.fastify.io/)-Server provides an API to query the data from a specific timestamp
